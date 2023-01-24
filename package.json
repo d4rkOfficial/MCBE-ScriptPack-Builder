@@ -1,6 +1,6 @@
 {
   "name": "mcbespb",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Gently tap the command and wait for an MCBE script package to be built!  Type annotation documentation and packaging commands will be all ready for you!",
   "main": "index.js",
   "repository": "https://github.com/d4rkOfficial/MCBE-ScriptPack-Builder",
@@ -9,6 +9,9 @@
   "type": "module",
   "scripts": {
     "demo": "node index.js"
+  },
+  "bin": {
+    "mcbespb": "./bin/cli.js"
   },
   "dependencies": {
     "@types/node": "^18.11.18",

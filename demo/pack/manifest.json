@@ -1,0 +1,46 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "demo",
+    "description": "demo",
+    "uuid": "ed1dadab-cbde-4948-aba5-860cc1b556ea",
+    "version": [
+      "1",
+      "0",
+      "0"
+    ],
+    "min_engine_version": [
+      1,
+      19,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "description": "demo",
+      "type": "script",
+      "language": "javascript",
+      "uuid": "601a6ac0-a4a8-4adf-9ce6-7c41a98d5d3d",
+      "version": [
+        0,
+        0,
+        1
+      ],
+      "entry": "scripts/index.js"
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "1.1.0-beta"
+    },
+    {
+      "module_name": "@minecraft/server-gametest",
+      "version": "1.0.0-beta"
+    },
+    {
+      "module_name": "@minecraft/server-ui",
+      "version": "1.0.0-beta"
+    }
+  ]
+}

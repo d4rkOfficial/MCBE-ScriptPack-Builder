@@ -1,0 +1,18 @@
+{
+  "name": "MCBE-ScriptPack-Builder",
+  "version": "1.0.0",
+  "description": "Gently tap the command and wait for an MCBE script package to be built!  Type annotation documentation and packaging commands will be all ready for you!",
+  "main": "index.js",
+  "repository": "https://github.com/d4rkOfficial/MCBE-ScriptPack-Builder",
+  "author": "D4rk <d4rk6666@outlook.com>",
+  "license": "MPL-2.0",
+  "type": "module",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "dependencies": {
+    "@types/node": "^18.11.18",
+    "kolorist": "^1.6.0",
+    "prompts": "^2.4.2"
+  }
+}

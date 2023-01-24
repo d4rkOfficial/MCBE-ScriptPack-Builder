@@ -142,7 +142,7 @@ try {
 
   writeFile(resolvePath(res.pack_name, 'package.json'), JSON.stringify({
     name: res.pack_name,
-    version: res.pack_vers,
+    version: res.pack_vers.map(Number),
     author: res.author,
     description: res.pack_desc,
     type: "module",
@@ -155,7 +155,7 @@ try {
       name: res.pack_name,
       description: res.pack_desc,
       uuid: res.pack_uuid,
-      version: res.pack_vers,
+      version: res.pack_vers.map(Number),
       min_engine_version: res.game_version[0],
     },
     modules: [

@@ -1,5 +1,5 @@
 {
-  "name": "MCBE-ScriptPack-Builder",
+  "name": "mcbespb",
   "version": "1.0.0",
   "description": "Gently tap the command and wait for an MCBE script package to be built!  Type annotation documentation and packaging commands will be all ready for you!",
   "main": "index.js",
@@ -8,7 +8,7 @@
   "license": "MPL-2.0",
   "type": "module",
   "scripts": {
-    "test": "node index.js"
+    "demo": "node index.js"
   },
   "dependencies": {
     "@types/node": "^18.11.18",

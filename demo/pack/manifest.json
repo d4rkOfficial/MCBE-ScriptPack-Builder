@@ -2,12 +2,12 @@
   "format_version": 2,
   "header": {
     "name": "demo",
-    "description": "demo",
-    "uuid": "ed1dadab-cbde-4948-aba5-860cc1b556ea",
+    "description": "no desc",
+    "uuid": "8f9e732d-781b-401a-94ae-e20ae617d7e8",
     "version": [
-      "1",
-      "0",
-      "0"
+      1,
+      0,
+      0
     ],
     "min_engine_version": [
       1,
@@ -17,10 +17,10 @@
   },
   "modules": [
     {
-      "description": "demo",
+      "description": "no desc",
       "type": "script",
       "language": "javascript",
-      "uuid": "601a6ac0-a4a8-4adf-9ce6-7c41a98d5d3d",
+      "uuid": "d4b55f4a-b086-4090-9c33-835355cef4d9",
       "version": [
         0,
         0,
@@ -40,6 +40,14 @@
     },
     {
       "module_name": "@minecraft/server-ui",
+      "version": "1.0.0-beta"
+    },
+    {
+      "module_name": "@minecraft/server-admin",
+      "version": "1.0.0-beta"
+    },
+    {
+      "module_name": "@minecraft/server-net",
       "version": "1.0.0-beta"
     }
   ]

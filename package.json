@@ -1,7 +1,7 @@
 {
   "name": "mcbespb",
-  "version": "1.0.1",
-  "description": "Gently tap the command and wait for an MCBE script package to be built!  Type annotation documentation and packaging commands will be all ready for you!",
+  "version": "1.0.2",
+  "description": "One line of command, create the MCBE script package project, and the entire structure and type documentation is ready for you!",
   "main": "index.js",
   "repository": "https://github.com/d4rkOfficial/MCBE-ScriptPack-Builder",
   "author": "D4rk <d4rk6666@outlook.com>",

@@ -1,2 +1,7 @@
 # MCBE-ScriptPack-Builder
-Gently tap the command and wait for an MCBE script package to be built!  Type annotation documentation and packaging tools will be all ready for you!
+
+One line of command, create the MCBE script package project, and the entire structure and type documentation is ready for you!
+
+```sh
+npx mcbespb
+```

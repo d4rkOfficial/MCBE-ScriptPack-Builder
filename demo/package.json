@@ -1,13 +1,12 @@
 {
   "name": "demo",
-  "version": [
-    1,
-    0,
-    0
-  ],
+  "version": "1.0.0",
   "author": "dark",
-  "description": "no desc",
+  "description": "test",
   "type": "module",
+  "scripts": {
+    "build": "npx tsc && npx zip -q -x pack/scripts/*.ts -r demo.mcpack pack"
+  },
   "devDependencies": {
     "@minecraft/server": "^1.1.0-beta.1.19.60-preview.26",
     "@minecraft/server-admin": "^1.0.0-beta.1.19.60-preview.26",

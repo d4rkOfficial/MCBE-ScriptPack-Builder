@@ -2,8 +2,8 @@
   "format_version": 2,
   "header": {
     "name": "demo",
-    "description": "no desc",
-    "uuid": "8f9e732d-781b-401a-94ae-e20ae617d7e8",
+    "description": "test",
+    "uuid": "db35f11e-b029-436e-a65e-83bc53242f91",
     "version": [
       1,
       0,
@@ -17,10 +17,10 @@
   },
   "modules": [
     {
-      "description": "no desc",
+      "description": "test",
       "type": "script",
       "language": "javascript",
-      "uuid": "d4b55f4a-b086-4090-9c33-835355cef4d9",
+      "uuid": "87fe6ffa-2152-4e81-b296-ac478ab3903e",
       "version": [
         0,
         0,

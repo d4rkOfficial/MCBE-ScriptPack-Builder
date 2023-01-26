@@ -92,23 +92,23 @@ const res = await prompts([
     instructions: false,
     choices: [
       {
-        title: '@minecraft/server',
+        title: COLOR.bgLightRed(COLOR.white('@minecraft/server')),
         value: ['@minecraft/server', '1.1.0-beta']
       },
       {
-        title: '@minecraft/server-gametest',
+        title: COLOR.bgYellow(COLOR.white('@minecraft/server-gametest')),
         value: ['@minecraft/server-gametest', '1.0.0-beta']
       },
       {
-        title: '@minecraft/server-ui',
+        title: COLOR.bgLightGreen(COLOR.white('@minecraft/server-ui')),
         value: ['@minecraft/server-ui', '1.0.0-beta']
       },
       {
-        title: '@minecraft/server-admin',
+        title: COLOR.bgLightCyan(COLOR.white('@minecraft/server-admin')),
         value: ['@minecraft/server-admin', '1.0.0-beta']
       },
       {
-        title: '@minecraft/server-net',
+        title: COLOR.bgMagenta(COLOR.white('@minecraft/server-net')),
         value: ['@minecraft/server-net', '1.0.0-beta']
       }
     ]
@@ -158,16 +158,15 @@ try {
 
   writeFile(resolvePath(res.pack_name, 'package.json'), JSON.stringify({
     name: res.pack_name,
-    version: res.pack_vers.map(Number),
+    version: '1.0.0',
     author: res.author,
     description: res.pack_desc,
     type: 'module',
     scripts: {
       build: res.language === 'js' // or else: ts
         ? `npx zip -q -r ${res.pack_name}.mcpack pack`
-        : `npx tsc && npx zip -q -x ${res.entry}/*.ts -r ${res.pack_name}.mcpack pack`
+        : `npx tsc && npx zip -q -x pack/scripts/*.ts -r ${res.pack_name}.mcpack pack`
     }
-    // @todo: scripts to pack the project
   }, null, 2))
 
   writeFile(resolvePath(res.pack_name, 'pack', 'manifest.json'), JSON.stringify({
@@ -195,7 +194,7 @@ try {
     })))()
   }, null, 2))
 
-  writeFile(resolvePath(res.pack_name, 'pack', 'scripts', res.entry), [
+  writeFile(resolvePath(res.pack_name, 'pack', 'scripts', res.language === 'js' ? res.entry : res.entry.replace(/\.js$/, '.ts')), [
     "import * as Server from '@minecraft/server'",
     'Server.world.events.worldInitialize.subscribe(() => {',
     "  Server.world.say('Hello, world!')",
@@ -210,13 +209,14 @@ try {
       compilerOptions: {
         target: 'esnext',
         module: 'esnext',
+        moduleResolution: 'nodenext',
         strict: false
       },
       include: [
         'pack/scripts'
       ]
     }, null, 2)// @todo
-    exec(`echo ${tsconfig} > tsconfig.json`, {
+    exec(`echo '${tsconfig}' > tsconfig.json`, {
       cwd: resolvePath(res.pack_name)
     })
   }

@@ -32,11 +32,26 @@ const res = await prompts([
     message: COLOR.lightGreen('MinecraftBE version? '),
     initial: 0,
     choices: [
-      { title: '1.19.60-beta+', value: [[1, 19, 0], true] },
-      { title: '1.19.x', value: [[1, 19, 0], true] },
-      { title: '1.18.x', value: [[1, 18, 0], false] },
-      { title: '1.17.x', value: [[1, 17, 0], false] },
-      { title: '1.16.210.x', value: [[1, 16, 210], false] }
+      {
+        title: '1.19.60-beta+',
+        value: [[1, 19, 0], true]
+      },
+      {
+        title: '1.19.x',
+        value: [[1, 19, 0], true]
+      },
+      {
+        title: '1.18.x',
+        value: [[1, 18, 0], false]
+      },
+      {
+        title: '1.17.x',
+        value: [[1, 17, 0], false]
+      },
+      {
+        title: '1.16.210.x',
+        value: [[1, 16, 210], false]
+      }
       // @todo: update version list
     ]
   },
@@ -54,7 +69,8 @@ const res = await prompts([
     message: COLOR.lightGreen('UUID: '),
     initial: randomUUID(),
     validate (uuid) {
-      return /[1234567890abcdef]{8}(-[1234567890abcdef]{4}){3}-[1234567890abcdef]{12}/.test(uuid.trim())
+      return /[1234567890abcdef]{8}(-[1234567890abcdef]{4}){3}-[1234567890abcdef]{12}/
+        .test(uuid.trim())
     }
   },
 
@@ -75,26 +91,26 @@ const res = await prompts([
     hint: '- Space to select. Enter to confirm.',
     instructions: false,
     choices: [
-      { 
+      {
         title: '@minecraft/server',
         value: ['@minecraft/server', '1.1.0-beta']
       },
-      { 
+      {
         title: '@minecraft/server-gametest',
         value: ['@minecraft/server-gametest', '1.0.0-beta']
       },
-      { 
+      {
         title: '@minecraft/server-ui',
         value: ['@minecraft/server-ui', '1.0.0-beta']
       },
-      { 
+      {
         title: '@minecraft/server-admin',
         value: ['@minecraft/server-admin', '1.0.0-beta']
       },
-      { 
+      {
         title: '@minecraft/server-net',
         value: ['@minecraft/server-net', '1.0.0-beta']
-      },
+      }
     ]
   },
 
@@ -115,7 +131,7 @@ const res = await prompts([
   {
     type: 'text',
     name: 'entry',
-    message: COLOR.lightGreen('Entry: ') + COLOR.lightGray('scripts/'),
+    message: COLOR.lightGreen('Entry:') + COLOR.lightGray('scripts/'),
     initial: 'index.js'
   }
 
@@ -131,7 +147,7 @@ const { ok } = await prompts({
 })
 
 if (!ok) abort()
-if (!res.game_version[1]) abort(`This game version is not supported!`)
+if (!res.game_version[1]) abort('This game version is not supported!')
 
 process.stdout.write('\n' + COLOR.lightCyan('- Please wait...'))
 
@@ -145,8 +161,13 @@ try {
     version: res.pack_vers.map(Number),
     author: res.author,
     description: res.pack_desc,
-    type: "module",
-    //@todo: scripts to pack the project
+    type: 'module',
+    scripts: {
+      build: res.language === 'js' // or else: ts
+        ? `npx zip -q -r ${res.pack_name}.mcpack pack`
+        : `npx tsc && npx zip -q -x ${res.entry}/*.ts -r ${res.pack_name}.mcpack pack`
+    }
+    // @todo: scripts to pack the project
   }, null, 2))
 
   writeFile(resolvePath(res.pack_name, 'pack', 'manifest.json'), JSON.stringify({
@@ -156,13 +177,13 @@ try {
       description: res.pack_desc,
       uuid: res.pack_uuid,
       version: res.pack_vers.map(Number),
-      min_engine_version: res.game_version[0],
+      min_engine_version: res.game_version[0]
     },
     modules: [
       {
         description: res.pack_desc,
-        type: "script",
-        language: "javascript",
+        type: 'script',
+        language: 'javascript',
         uuid: randomUUID(),
         version: [0, 0, 1],
         entry: 'scripts/' + res.entry
@@ -176,21 +197,29 @@ try {
 
   writeFile(resolvePath(res.pack_name, 'pack', 'scripts', res.entry), [
     "import * as Server from '@minecraft/server'",
-    "Server.world.events.worldInitialize.subscribe(() => {",
+    'Server.world.events.worldInitialize.subscribe(() => {',
     "  Server.world.say('Hello, world!')",
-    "})"
+    '})'
   ].join('\n'))
-
-  exec(`npm install ${res.modules.reduce((acc, cur) => acc + cur[0] + "@beta ", "")} --save-dev`, {
+  exec(`npm install ${res.modules.reduce((acc, cur) => acc + cur[0] + '@beta ', '')} --save-dev`, {
     cwd: resolvePath(res.pack_name)
   })
 
   if (res.language === 'ts') {
-    exec("tsc --init", {
+    const tsconfig = JSON.stringify({
+      compilerOptions: {
+        target: 'esnext',
+        module: 'esnext',
+        strict: false
+      },
+      include: [
+        'pack/scripts'
+      ]
+    }, null, 2)// @todo
+    exec(`echo ${tsconfig} > tsconfig.json`, {
       cwd: resolvePath(res.pack_name)
     })
   }
-
 } catch (err) {
   abort(err)
 }

@@ -1,0 +1,24 @@
+{
+  "name": "mcbespb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": "https://github.com/d4rkOfficial/MCBE-ScriptPack-Builder",
+  "author": "D4rk <d4rk6666@outlook.com>",
+  "license": "MPL-2.0",
+  "type": "module",
+  "scripts": {
+    "default": "node index.js"
+  },
+  "bin": {
+    "mcbespb": "./bin/cli.js"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^6.0.1",
+    "@types/node": "^18.11.18",
+    "pngjs": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/pngjs": "^6.0.5"
+  }
+}

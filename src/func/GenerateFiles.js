@@ -38,11 +38,11 @@ export default async function generateFiles(
 
         await fs.writeFile(
             path.join(projectPath, "resource_packs", packName, "manifest.json"),
-            JSON.stringify(manifestRes),
+            JSON.stringify(manifestRes, null, 4),
         )
         await fs.writeFile(
             path.join(projectPath, "behavior_packs", packName, "manifest.json"),
-            JSON.stringify(manifestBeh),
+            JSON.stringify(manifestBeh, null, 4),
         )
 
         let content

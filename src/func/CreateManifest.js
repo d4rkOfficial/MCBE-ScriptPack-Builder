@@ -68,11 +68,11 @@ export default async function createManifest(info) {
         dependencies: [
             {
                 module_name: "@minecraft/server",
-                version: info.minecraft_server_version,
+                version: info.minecraft_server_version.split("-")[0],
             },
             {
                 module_name: "@minecraft/server-ui",
-                version: info.minecraft_server_ui_version,
+                version: info.minecraft_server_ui_version.split("-")[0],
             },
             {
                 uuid: info.uuid1,

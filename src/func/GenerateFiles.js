@@ -60,7 +60,7 @@ function mainTick() {
 mc.system.run(mainTick)`
         await fs.writeFile(path.join(projectPath, "scripts", "main.ts"), content)
 
-        content = `PROJECT_NAME="starter"
+        content = `PROJECT_NAME="${packName}"
 MINECRAFT_PRODUCT="BedrockUWP"
 CUSTOM_DEPLOYMENT_PATH=""`
         await fs.writeFile(path.join(projectPath, ".env"), content)

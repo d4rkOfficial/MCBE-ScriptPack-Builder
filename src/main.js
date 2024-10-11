@@ -113,6 +113,12 @@ try {
     await confirm({ message: "Is that ok?", default: true })
 
     await generateFiles(name, manifestRes, manifestBeh, selected_v_mc, selected_v_ui, selected_v_math, selected_v_data)
+
+    process.stdout.write(`\x1b[1mNow run:\x1b[0m
+    cd ${name}
+    npm i
+    powershell Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+    `)
 } catch {
     process.stdout.write("aborted!\n")
 } finally {

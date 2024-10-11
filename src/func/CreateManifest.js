@@ -40,7 +40,7 @@ export default async function createManifest(info) {
         ],
         dependencies: [
             {
-                uuid: "14e467b4-e3aa-49d3-8352-f8439fd7b2ee",
+                uuid: info.uuid3,
                 version: [1, 0, 0],
             },
         ],
@@ -75,7 +75,7 @@ export default async function createManifest(info) {
                 version: info.minecraft_server_ui_version,
             },
             {
-                uuid: "2d7ed858-97eb-48a0-b180-7c80d1ce9a48",
+                uuid: info.uuid1,
                 version: [1, 0, 0],
             },
         ],

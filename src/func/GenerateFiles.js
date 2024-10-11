@@ -18,7 +18,7 @@ export default async function generateFiles(
         await fs.mkdir(path.join(projectPath, ".vscode"), { recursive: true })
         await fs.mkdir(path.join(projectPath, "resource_packs", packName), { recursive: true })
         await fs.mkdir(path.join(projectPath, "behavior_packs", packName), { recursive: true })
-        await fs.mkdir(path.join(projectPath, "scripts", packName), { recursive: true })
+        await fs.mkdir(path.join(projectPath, "scripts"), { recursive: true })
 
         let packIcon = new PNG({ width: 1, height: 1 })
         packIcon.data = [
@@ -48,11 +48,16 @@ export default async function generateFiles(
         let content
 
         content = `import * as mc from "@minecraft/server"
-import * as data from "@minecraft/vanilla-data"
 
-mc.world.beforeEvents.worldInitialize.subscribe((event) => {
-    mc.world.sendMessage("Hello, world!")
-})`
+function mainTick() {
+    if (mc.system.currentTick % 100 === 0) {
+        mc.world.sendMessage("Hello, world! @tick: " + mc.system.currentTick)
+    }
+
+    mc.system.run(mainTick)
+}
+
+mc.system.run(mainTick)`
         await fs.writeFile(path.join(projectPath, "scripts", "main.ts"), content)
 
         content = `PROJECT_NAME="starter"

@@ -4,14 +4,14 @@ import { input } from "@inquirer/prompts"
  * @private
  * @const
  */
-const HELP_TEXT = `\x1b[35m${center("MCBE Script Pack Builder")}
+const HELP_TEXT = `\x1b[32m${center("MCBE Script Pack Builder")}
 \x1b[36m
 usage: mcbespb [ -v | --version ] [ -h | --help ]
                [ [<arg1> [<value1>]] ... [<argN> [<valueN>]] ]
 \x1b[0m
 These are all optional args:
 (if nessacery one is absent, we will inquire you with cli)
-\x1b[36m
+
 Initialize pack basic info:
     --name    Name of the pack
     --desc    Description of the pack
@@ -23,15 +23,8 @@ Initialize pack basic info:
     --uuid4   The same as above
     --author  The author, your name or e-mail address or something,
               if ungiven, we will let it be 'unknown'
-\x1b[0m
-Just-Scripts:
-    --lint    Run eslint
-    --build   Build your project
-    --clean   Clean temp/, lib/, dist/
-    --deploy  Deploy the pack locally
-    --mcaddon Zip the pack into '.mcaddon'
 
-\x1b[33m${center("> press enter to exit. <")}\x1b[0m
+${center("> press enter to exit. <")}
 `
 
 /**

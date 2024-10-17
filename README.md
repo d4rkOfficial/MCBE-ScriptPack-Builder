@@ -1,25 +1,26 @@
 # MCBE-ScriptPack-Builder
 
-这是一个用于创建Minecraft服务器项目的脚手架工具。它可以帮助您快速创建一个新的Minecraft基岩版脚本包项目，并自动安装所需的依赖项。所生成的脚本包项目可结合Vscode插件[Minecraft Debugger](https://marketplace.visualstudio.com/items?itemName=mojang-studios.minecraft-debugger)，支持TypeScript开发，支持`@minecraft/vanilla-data`模块。
+MCBE-ScriptPack-Builder 是一款用于创建 Minecraft 基岩版服务器项目的脚手架工具。它旨在帮助您快速生成新的脚本包项目，并自动安装所需的依赖项。所创建的脚本包项目可以与 Vscode 插件 [Minecraft Debugger](https://marketplace.visualstudio.com/items?itemName=mojang-studios.minecraft-debugger) 结合使用，并支持 TypeScript 开发。默认情况下，项目将引入 `@minecraft/vanilla-data` 模块（官方提供，包含各种原版实体、方块、药效和物品的类型 ID）。
 
-
-参见：[官方开发者文档](https://learn.microsoft.com/en-us/minecraft/creator/documents/scriptinggettingstarted?view=minecraft-bedrock-stable)
+有关更多信息，请参见[官方开发者文档](https://learn.microsoft.com/en-us/minecraft/creator/documents/scriptinggettingstarted?view=minecraft-bedrock-stable)。
 
 ## 快速开始
-要使用此脚手架工具，请：
 
-确保您已经安装了Node.js（推荐Node20以上）。如果没有，请从[此链接](https://nodejs.org/) 下载并安装。
+要使用此脚手架工具，请确保您已经安装了 Node.js（推荐使用 Node 20 或更高版本）。如果没有安装，请从[Node.js 官网](https://nodejs.org/)下载并安装。
 
-操作系统：Windows10以上。推荐使用Vscode。
+**操作系统要求**：Windows 10 及以上版本。推荐使用 Visual Studio Code（Vscode）。
 
 ### 创建脚本包
-使用以下命令
+
+使用以下命令启动脚手架工具：
+
 ```sh
 npx mcbespb
 ```
 
-接下来会询问您项目具体信息，其中`name`、`desc`、`auth`、`uuid1`、`uuid2`、`uuid3`、`uuid4`可以通过带参指定。
-询问您的四个uuid依次是 资源包uuid、资源包模块uuid、行为包uuid、行为包模块uuid，用来确保您的工程对于游戏来说是独一无二的，默认是随机生成的。
+接下来，您将被询问项目的具体信息，包括 `name`、`desc`、`auth`、`uuid1`、`uuid2`、`uuid3`、`uuid4`。其中，`uuid1`、`uuid2`、`uuid3` 和 `uuid4` 分别对应资源包的 UUID、资源包模块的 UUID、行为包的 UUID 和行为包脚本模块的 UUID，以确保您的项目在游戏中具有唯一性。默认情况下，这些 UUID 将随机生成。
+
+示例输入：
 ```
 ✔ Name: test
 ✔ Desc: test
@@ -28,83 +29,82 @@ npx mcbespb
 ...
 ```
 
+您也可以通过命令行参数指定脚本包的基本信息：
 ```sh
-# 带参指定脚本包基本信息
 npx mcbespb --name MyScriptPack --desc "Hello, world" --auth Steve
 ```
 
-创建完成后，按照指引，输入
+创建完成后，请按照指引，输入以下命令以进入项目目录并安装依赖：
 ```sh
 cd "你的脚本项目"
-npm i
+npm install
 powershell Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 ```
 
-### 开发、测试和打包相关
+### 开发、测试和打包
 
-#### 把脚本包推入Minecraft
+#### 推送脚本包到 Minecraft
 
-终端打开你的脚本项目目录，运行以下命令
+在终端中打开您的脚本项目目录，运行以下命令：
 ```sh
 npm run local-deploy
 ```
 
-这将会使用一个叫做[just-scripts](https://microsoft.github.io/just/scripts/)的构建工具，自动编译你项目中的TypeScript，并且推入Minecraft基岩版客户端。
+此命令将使用 [just-scripts](https://microsoft.github.io/just/scripts/) 构建工具，自动编译项目中的 TypeScript 代码，并将其推送到 Minecraft 基岩版客户端。
 
-现在打开Minecraft，创建一个世界，在这之前，在行为包界面勾选刚才你创建的脚本包。
+打开 Minecraft，创建一个新世界并在行为包界面勾选刚才创建的脚本包。
 
-
-如果你没有修改，那么，`scripts/main.ts`作为脚本项目的默认入口文件，其内容应该是：
+如果您未修改项目内容，则 `scripts/main.ts` 将作为默认入口文件，其内容应如下所示：
 ```ts
-import * as mc from "@minecraft/server"
+import * as mc from "@minecraft/server";
 
 function mainTick() {
     if (mc.system.currentTick % 100 === 0) {
-        mc.world.sendMessage("Hello, world! @tick: " + mc.system.currentTick)
+        mc.world.sendMessage("Hello, world! @tick: " + mc.system.currentTick);
     }
-
-    mc.system.run(mainTick)
+    mc.system.run(mainTick);
 }
 
-mc.system.run(mainTick)
+mc.system.run(mainTick);
 ```
 
-现在打开你创建的世界，每100tick，消息栏就会显示一条`Hello, world! @tick: 当前tick`的消息，这说明代码已经跑起来了，恭喜！
+在您创建的世界中，每经过 100 tick，消息栏将显示一条 `Hello, world! @tick: 当前tick` 的消息，说明代码已成功运行，恭喜您！
 
 #### 开始写代码
-为了一边开发，一边测试，可以输入：
+
+在开发过程中，您可以使用以下命令进行实时测试：
 ```sh
 npm run local-deploy -- --watch
 ```
-
-或者
+或
 ```sh
 npm run watch
 ```
 
-这将监听你对脚本包的改动，并且自动推入你的Minecraft和开发存档中，如果你需要在游戏内重新加载你写好的新内容，在游戏内输入以下命令（需要作弊模式）：
+这将监控脚本包的更改并自动将其推送到您的 Minecraft 开发存档中。若需要在游戏内重新加载已修改的内容，请在游戏中输入以下命令（需启用作弊模式）：
 ```sh
 /reload
 ```
 
-#### 其他
-整理源代码，使用以下命令
-```sh
-npm run lint
-```
+#### 其他功能
 
-构建静态文件，使用以下命令
-```sh
-npm run build
-```
+- **整理源代码**：使用以下命令
+    ```sh
+    npm run lint
+    ```
 
-清理中间产物文件，使用以下命令
-```sh
+- **构建静态文件**：使用以下命令
+    ```sh
+    npm run build
+    ```
 
-npm run clean
-```
+- **清理中间产物文件**：使用以下命令
+    ```sh
+    npm run clean
+    ```
 
-打包成`.mcaddon`文件，使用以下命令
-```sh
-npm run mcaddon
+- **打包为 `.mcaddon` 文件**：使用以下命令
+    ```sh
+    npm run mcaddon
+    ```
 ```

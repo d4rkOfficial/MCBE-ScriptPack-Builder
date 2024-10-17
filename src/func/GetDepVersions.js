@@ -5,97 +5,98 @@ import { tmpdir } from "node:os"
 /**
  * @private
  * @typedef {`@minecraft/${'common'|'debug-utilities'|`server${'-admin'|'-gametest'|'-net'|'-ui'|'-editor'|''}`|'vanilla-data'}`} Module
- * @desc except for vanilla-data, they are all internal module, that runs as dependencies in minecraft client or BDS
- * @desc vanilla-data is special, an external module, but still need version inquery, in which way min engine version can be confirmed
+ * @description Represents available Minecraft modules, with vanilla-data being the only external module.
  */
 
 /**
  * @private
  * @typedef {Object} Options
- * @property {boolean=} beta
- * @property {number=} page
- * @property {number=} pageSize
+ * @property {boolean=} isBeta - Determines if beta versions should be included.
+ * @property {number=} page - The page number of results.
+ * @property {number=} pageSize - The number of results per page.
  */
 
 /**
  * @private
- * @typedef {`${number}.${number}.${number}${`'-'${string}`|''}`} DependencyVersionFormat
+ * @typedef {`${number}.${number}.${number}${`'-'${string}`|''}`} DependencyVersion
+ * @description Represents the format for dependency version strings.
  */
 
 /**
  * @private
- * @typedef {[number, number, number]} MinEngineVersionFormat
+ * @typedef {[number, number, number]} MinEngineVersion
+ * @description Represents the minimum engine version as an array of three numbers.
  */
 
 /**
  * @private
- * @type {Map<Module, DependencyVersionFormat[]>}
+ * @type {Map<Module, DependencyVersion[]>}
  */
-let versionLists = new Map()
+let versionMap = new Map()
 
 /**
  * @public
- * @function getDepVersions
- * @param {Module} module
- * @param {Options} options
- * @returns {Promise<DependencyVersionFormat[]>}
+ * @function getDependencyVersions
+ * @param {Module} module - The module to query.
+ * @param {Options} options - The query options.
+ * @returns {Promise<DependencyVersion[]>} - A promise that resolves to the list of dependency versions for the specified module.
  */
-export default async function getDepVersions(module, options = { beta: false }) {
-    let result
+export default async function getDependencyVersions(module, options = { isBeta: false }) {
+    let versionList
 
-    if (!versionLists.has(module)) {
-        await loadLoacalVersions(module)
+    if (!versionMap.has(module)) {
+        await loadLocalVersions(module)
     }
 
-    if (!versionLists.has(module)) {
+    if (!versionMap.has(module)) {
         await downloadVersions(module)
     }
 
-    let { beta } = options
-    let versionList = versionLists.get(module)
-    result = [...versionList]
-    if (beta) {
-        result = result.filter((version) => version.includes("-"))
+    const { isBeta } = options
+    versionList = [...versionMap.get(module)]
+
+    if (isBeta) {
+        versionList = versionList.filter((version) => version.includes("-"))
     }
 
-    return result
+    return versionList
 }
 
 /**
  * @private
- * @param {Module} module
+ * @param {Module} module - The module to load versions for.
  * @returns {Promise<void>}
  */
-async function loadLoacalVersions(module) {
-    let logFileList = (await fs.readdir(tmpdir()))
+async function loadLocalVersions(module) {
+    const logFileList = (await fs.readdir(tmpdir()))
         .filter((file) => /^mcbespb-/.test(file) && /-\d{4}-\d{1,2}-\d{1,2}.log$/.test(file))
-        .filter((file) => file.includes(module.replace('/', '_')))
+        .filter((file) => file.includes(module.replace("/", "_")))
         .filter((file) => {
-            let date = new Date(file.match(/\d{4}-\d{1,2}-\d{1,2}/)[0])
-            return date - new Date() <= 0x75a40
+            const date = new Date(file.match(/\d{4}-\d{1,2}-\d{1,2}/)[0])
+            return date - new Date() <= 0x75a40 // Filter for recent log files
         })
-        .sort((...file) => {
-            let [date1, date2] = file.map((name) => new Date(name.match(/\d{4}-\d{1,2}-\d{1,2}/)[0]))
-            return date1 > date2
+        .sort((file1, file2) => {
+            const [date1, date2] = [new Date(file1.match(/\d{4}-\d{1,2}-\d{1,2}/)[0]), new Date(file2.match(/\d{4}-\d{1,2}-\d{1,2}/)[0])]
+            return date1 - date2
         })
 
     if (logFileList[0]) {
-        let buffer = fs.readFile(path.resolve(tmpdir(), logFileList[0]))
-        let content = (await buffer).toString("utf-8")
-        versionLists.set(
+        const buffer = await fs.readFile(path.resolve(tmpdir(), logFileList[0]))
+        const content = buffer.toString("utf-8")
+        versionMap.set(
             module,
-            content.split("\n").filter((content) => content.trim()),
+            content.split("\n").filter((line) => line.trim()),
         )
     }
 }
 
 /**
  * @private
- * @param {Module} module
+ * @param {Module} module - The module to download versions for.
  * @returns {Promise<void>}
  */
 async function downloadVersions(module) {
-    for (let mirror of [
+    for (const mirror of [
         "https://registry.npmjs.org/",
         "http://registry.npmmirror.com/",
         "https://npm.aliyun.com/",
@@ -107,35 +108,29 @@ async function downloadVersions(module) {
     ]) {
         let response
         try {
-            let controller = new AbortController()
-            let abortSignal = controller.signal
-            let TIMEOUT_DELAY = 5000
+            const controller = new AbortController()
+            const timeoutSignal = controller.signal
+            const TIMEOUT_DELAY = 5000
             setTimeout(() => controller.abort(), TIMEOUT_DELAY)
-            response = await fetch(`${mirror}${module}`, { signal: abortSignal })
+            response = await fetch(`${mirror}${module}`, { signal: timeoutSignal })
         } catch {
-            continue
+            continue // Skip to the next mirror if fetch fails
         }
 
-        let { versions } = await response.json()
-        let versionsFinal = [...new Set(Object.keys(versions))].reverse()
-        versionLists.set(module, versionsFinal)
+        const { versions } = await response.json()
+        const uniqueVersions = [...new Set(Object.keys(versions))].reverse()
+        versionMap.set(module, uniqueVersions)
 
-        let now = new Date()
-        let localTime = new Date(now.getTime() + now.getTimezoneOffset() * 0xe800)
-        let year = localTime.getFullYear()
-        let month = localTime.getMonth() + 1
-        let day = localTime.getDate()
-
-        let logName = `mcbespb-${module.replace('/', '_')}-${year}-${month}-${day}.log`
-        let logContent = versionsFinal.join(`\n`)
-        let logPath = path.resolve(tmpdir(), logName)
+        const now = new Date()
+        const localTime = new Date(now.getTime() + now.getTimezoneOffset() * 60 * 1000)
+        const logName = `mcbespb-${module.replace("/", "_")}-${localTime.getFullYear()}-${localTime.getMonth() + 1}-${localTime.getDate()}.log`
+        const logContent = uniqueVersions.join("\n")
+        const logPath = path.resolve(tmpdir(), logName)
 
         try {
             await fs.writeFile(logPath, logContent)
         } catch {}
 
-        break
+        break // Exit after the first successful fetch
     }
 }
-
-

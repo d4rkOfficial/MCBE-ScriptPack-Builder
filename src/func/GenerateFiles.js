@@ -1,8 +1,19 @@
 import fs from "fs/promises"
 import path from "node:path"
 import { PNG } from "pngjs"
+
 /**
+ * Generates the project files for a Minecraft pack.
  * @public
+ * @async
+ * @function generateFiles
+ * @param {string} packName - The name of the pack to create.
+ * @param {import("./CreateManifest").ResourceManifest} manifestRes - The resource pack manifest data.
+ * @param {import("./CreateManifest").BehaviorManifest} manifestBeh - The behavior pack manifest data.
+ * @param {string} selected_v_mc - The selected Minecraft version.
+ * @param {string} selected_v_ui - The selected Minecraft-UI version.
+ * @param {string} selected_v_data - The selected Vanilla-data version.
+ * @returns {Promise<void>} A promise that resolves when all files are generated.
  */
 export default async function generateFiles(
     packName,

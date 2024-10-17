@@ -4,7 +4,9 @@ import { tmpdir } from "node:os"
 
 /**
  * @private
- * @typedef {`@minecraft/${'server'|'server-ui'|'math'|'vanilla-data'}`} Module
+ * @typedef {`@minecraft/${'common'|'debug-utilities'|`server${'-admin'|'-gametest'|'-net'|'-ui'|'-editor'|''}`|'vanilla-data'}`} Module
+ * @desc except for vanilla-data, they are all internal module, that runs as dependencies in minecraft client or BDS
+ * @desc vanilla-data is special, an external module, but still need version inquery, in which way min engine version can be confirmed
  */
 
 /**

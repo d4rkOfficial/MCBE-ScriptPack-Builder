@@ -1,6 +1,6 @@
 # MCBE-ScriptPack-Builder
 
-这是一个用于创建Minecraft服务器项目的脚手架工具。它可以帮助您快速创建一个新的Minecraft基岩版脚本包项目，并自动安装所需的依赖项。所生成的脚本包项目支持Vscode插件[Minecraft Debugger](https://marketplace.visualstudio.com/items?itemName=mojang-studios.minecraft-debugger)，支持TypeScript开发，支持`@minecraft/vanilla-data`模块。
+这是一个用于创建Minecraft服务器项目的脚手架工具。它可以帮助您快速创建一个新的Minecraft基岩版脚本包项目，并自动安装所需的依赖项。所生成的脚本包项目可结合Vscode插件[Minecraft Debugger](https://marketplace.visualstudio.com/items?itemName=mojang-studios.minecraft-debugger)，支持TypeScript开发，支持`@minecraft/vanilla-data`模块。
 
 
 参见：[官方开发者文档](https://learn.microsoft.com/en-us/minecraft/creator/documents/scriptinggettingstarted?view=minecraft-bedrock-stable)
@@ -19,12 +19,12 @@ npx mcbespb
 ```
 
 接下来会询问您项目具体信息，其中`name`、`desc`、`auth`、`uuid1`、`uuid2`、`uuid3`、`uuid4`可以通过带参指定。
-四个uuid用于区别您的脚本包和其他脚本包，uuid1、uuid2分配给资源包，uuid3、uuid4分配给行为包。
+询问您的四个uuid依次是 资源包uuid、资源包模块uuid、行为包uuid、行为包模块uuid，用来确保您的工程对于游戏来说是独一无二的，默认是随机生成的。
 ```
 ✔ Name: test
 ✔ Desc: test
 ✔ Author: test
-✔ UUID1: 383a9e67-02d3-488d-8758-7dc48ad6568b
+✔ UUID(Rp): 383a9e67-02d3-488d-8758-7dc48ad6568b
 ...
 ```
 
@@ -77,14 +77,34 @@ mc.system.run(mainTick)
 npm run local-deploy -- --watch
 ```
 
+或者
+```sh
+npm run watch
+```
+
 这将监听你对脚本包的改动，并且自动推入你的Minecraft和开发存档中，如果你需要在游戏内重新加载你写好的新内容，在游戏内输入以下命令（需要作弊模式）：
 ```sh
 /reload
 ```
 
-#### 打包脚本包
+#### 其他
+整理源代码，使用以下命令
+```sh
+npm run lint
+```
 
-生成`.mcaddon`文件，使用以下命令
+构建静态文件，使用以下命令
+```sh
+npm run build
+```
+
+清理中间产物文件，使用以下命令
+```sh
+
+npm run clean
+```
+
+打包成`.mcaddon`文件，使用以下命令
 ```sh
 npm run mcaddon
 ```

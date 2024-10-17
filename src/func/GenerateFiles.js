@@ -10,7 +10,6 @@ export default async function generateFiles(
     manifestBeh,
     selected_v_mc,
     selected_v_ui,
-    selected_v_math,
     selected_v_data,
 ) {
     let projectPath = path.join(process.cwd(), packName)
@@ -27,10 +26,12 @@ export default async function generateFiles(
             Math.floor(Math.random() * 256),
             255,
         ]
+
         await fs.writeFile(
             path.join(projectPath, "resource_packs", packName, "pack_icon.png"),
             PNG.sync.write(packIcon),
         )
+
         await fs.writeFile(
             path.join(projectPath, "behavior_packs", packName, "pack_icon.png"),
             PNG.sync.write(packIcon),
@@ -192,12 +193,12 @@ task("mcaddon", series("clean-local", "build", "createMcaddonFile"))
         "build": "just-scripts build",
         "clean": "just-scripts clean",
         "local-deploy": "just-scripts local-deploy",
+        "watch": "just-scripts local-deploy -- --watch",
         "mcaddon": "just-scripts mcaddon",
         "enablemcloopback": "CheckNetIsolation.exe LoopbackExempt -a -p=S-1-15-2-1958404141-86561845-1752920682-3514627264-368642714-62675701-733520436",
         "enablemcpreviewloopback": "CheckNetIsolation.exe LoopbackExempt -a -p=S-1-15-2-424268864-5579737-879501358-346833251-474568803-887069379-4040235476"
     },
     "dependencies": {
-        "@minecraft/math": "^${selected_v_math}",
         "@minecraft/server": "^${selected_v_mc}",
         "@minecraft/server-ui": "^${selected_v_ui}",
         "@minecraft/vanilla-data": "^${selected_v_data}"

@@ -11,9 +11,9 @@ try {
     let processArgs = new Map()
     let { argv } = process
     for (let i = 0; i < argv.length; i++) {
-        if (argv[i].startsWith(`-`)) {
+        if (argv[i].startsWith("-")) {
             let next = argv?.[i + 1] ?? ""
-            if (next.startsWith(`-`)) {
+            if (next.startsWith("-")) {
                 processArgs.set(argv[i], "")
             } else {
                 processArgs.set(argv[i], next.toLowerCase() ?? "")
@@ -37,28 +37,37 @@ try {
     let auth = processArgs.get("--author") ?? (await input({ message: "Author:" })) ?? "unknown"
 
     let validate = (uuidInput) => /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(uuidInput.trim().toLowerCase())
-    let uuid1 = processArgs.get("--uuid1") ?? (await input({ message: "UUID1:", default: randomUUID(), validate }))
-    let uuid2 = processArgs.get("--uuid2") ?? (await input({ message: "UUID2:", default: randomUUID(), validate }))
-    let uuid3 = processArgs.get("--uuid3") ?? (await input({ message: "UUID3:", default: randomUUID(), validate }))
-    let uuid4 = processArgs.get("--uuid4") ?? (await input({ message: "UUID4:", default: randomUUID(), validate }))
+    let uuid1 = processArgs.get("--uuid1") ?? (await input({ message: "UUID(Rp):", default: randomUUID(), validate }))
+    let uuid2 = processArgs.get("--uuid2") ?? (await input({ message: "UUID(Rm):", default: randomUUID(), validate }))
+    let uuid3 = processArgs.get("--uuid3") ?? (await input({ message: "UUID(Bp):", default: randomUUID(), validate }))
+    let uuid4 = processArgs.get("--uuid4") ?? (await input({ message: "UUID(Bm):", default: randomUUID(), validate }))
 
-    let v_mc, v_ui, v_math, v_data
+    /**
+     * [x] @minecraft/server                    (internal)
+     * [x] @minecraft/server-ui                 (internal)
+     * [ ] @minecraft/server-gametest           (internal)
+     * [ ] @minecraft/common                    (internal)
+     * [ ] @minecraft/debug-utilities           (internal)
+     * [ ] @minecraft/server-admin              (internal) (bds_only)
+     * [ ] @minecraft/server-net                (internal) (bds_only)
+     * [ ] @minecraft/server-editor             (internal) (prerelease)
+     * [x] @minecraft/vanilla-data              (external) (important)
+     * [ ] @minecraft/math                      (external) (unimportant)
+     */
+    let v_mc, v_ui, v_test, v_data
     await ProgressBar.listen(async (setProgress, setHintText, close, sleep) => {
         setHintText("Getting versions of dependencies...")
         await sleep(1000)
         setHintText("")
         v_mc = await getDepVersions("@minecraft/server")
         await sleep(100)
-        setProgress(1, 4)
+        setProgress(1, 3)
         v_ui = await getDepVersions("@minecraft/server-ui")
         await sleep(100)
-        setProgress(2, 4)
-        v_math = await getDepVersions("@minecraft/math")
-        await sleep(100)
-        setProgress(3, 4)
+        setProgress(2, 3)
         v_data = await getDepVersions("@minecraft/vanilla-data")
         await sleep(100)
-        setProgress(4, 4)
+        setProgress(3, 3)
         await sleep(500)
         close("\x1b[32m✔\x1b[0m Successfully getting versions of dependencies!")
     })
@@ -67,18 +76,15 @@ try {
     if (await confirm({ message: "Use Latest Dependencies?", default: false })) {
         selected_v_mc = v_mc.filter((v) => !v.includes("-"))[0]
         selected_v_ui = v_ui.filter((v) => !v.includes("-"))[0]
-        selected_v_math = v_math.filter((v) => !v.includes("-"))[0]
         selected_v_data = v_data.filter((v) => !v.includes("-"))[0]
 
         process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/server version: \x1b[36m${selected_v_mc}\x1b[0m\n`)
         process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/server-ui version: \x1b[36m${selected_v_ui}\x1b[0m\n`)
-        process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/math version: \x1b[36m${selected_v_math}\x1b[0m\n`)
         process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/vanilla-data version: \x1b[36m${selected_v_data}\x1b[0m\n`)
         process.stdout.write(`\x1b[35m  (automatically)\x1b[0m\n`)
     } else {
         selected_v_mc = await chooseVersion(v_mc, "@minecraft/server version:")
         selected_v_ui = await chooseVersion(v_ui, "@minecraft/server-ui version:")
-        selected_v_math = await chooseVersion(v_math, "@minecraft/math version:")
         selected_v_data = await chooseVersion(v_data, "@minecraft/vanilla-data version:")
         process.stdout.write(`\x1b[35m  (manually)\x1b[0m\n`)
 
@@ -100,19 +106,25 @@ try {
         min_engine_version: (
             await input({
                 message: "Min-Engine-Version:",
-                default: selected_v_data.split("-")[0].replace(/\./g, ", "),
-                validate: (input) => /^\s*\d+\s*,\s*\d+\s*,\s*\d+\s*$/.test(input),
+                default: selected_v_data
+                    .split("-")[0]
+                    .split(".")
+                    .map((val, idx) => (idx === 2 ? 0 : val))
+                    .join("."),
+                validate: (input) => /^\s*\d+\s*\.\s*\d+\s*\.\s*\d+\s*$/.test(input),
             })
         )
-            .split(",")
-            .map((val) => Number(val)),
+            .split(".")
+            .map((ver) => Number(ver.trim())),
         minecraft_server_version: selected_v_mc.split("-")[0],
         minecraft_server_ui_version: selected_v_ui.split("-")[0],
     })
 
-    await confirm({ message: "Is that ok?", default: true })
+    if (!(await confirm({ message: "Is that ok?", default: true }))) {
+        throw void 0
+    }
 
-    await generateFiles(name, manifestRes, manifestBeh, selected_v_mc, selected_v_ui, selected_v_math, selected_v_data)
+    await generateFiles(name, manifestRes, manifestBeh, selected_v_mc, selected_v_ui, selected_v_data)
 
     process.stdout.write(`\x1b[1mNow run:\x1b[0m
     cd ${name}
@@ -124,4 +136,3 @@ try {
 } finally {
     process.exit(0)
 }
-

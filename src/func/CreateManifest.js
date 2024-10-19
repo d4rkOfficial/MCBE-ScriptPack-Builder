@@ -9,8 +9,9 @@
  * @property {string} uuid3 - The unique UUID for the pack (b).
  * @property {string} uuid4 - The unique UUID for the pack (s).
  * @property {[number, number, number]} min_engine_version - The minimum engine version required.
- * @property {`${number}.${number}.${number}`} minecraft_server_version - The version of the Minecraft server.
- * @property {`${number}.${number}.${number}`} minecraft_server_ui_version - The version of the Minecraft server UI.
+ * @property {`${number}.${number}.${number}`} minecraft_server_version - The version of minecraft/server.
+ * @property {`${number}.${number}.${number}`} minecraft_server_ui_version - The version of the minecraft/server-ui.
+ * @property {`${number}.${number}.${number}`} minecraft_server_gametest_version - The version of the minecraft/server-gametest.
  */
 
 /**
@@ -140,6 +141,10 @@ export default async function createManifest(info) {
             {
                 module_name: "@minecraft/server-ui",
                 version: info.minecraft_server_ui_version.split("-")[0],
+            },
+            {
+                module_name: "@minecraft/server-gametest",
+                version: info.minecraft_server_gametest_version.split("-")[0],
             },
             {
                 uuid: info.uuid1,

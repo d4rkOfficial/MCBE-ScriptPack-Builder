@@ -6,6 +6,7 @@ import createManifest from "./func/CreateManifest.js"
 import { confirm, input, select } from "@inquirer/prompts"
 import { randomUUID } from "crypto"
 import ProgressBar from "./classes/ProgressBar.js"
+import { type } from "os"
 
 const parseCommandLineArgs = () => {
     const processArgs = new Map()
@@ -60,28 +61,28 @@ try {
     const uuid3 = processArgs.get("--uuid3") ?? (await input({ message: "UUID(b):", default: randomUUID(), validate: validateUUID }))
     const uuid4 = processArgs.get("--uuid4") ?? (await input({ message: "UUID(s):", default: randomUUID(), validate: validateUUID }))
 
-    /**
+    let progressSteps = 0
+    const totalSteps = 3
+
+    /*
      * [x] @minecraft/server                    (internal)
      * [x] @minecraft/server-ui                 (internal)
-     * [ ] @minecraft/server-gametest           (internal)
+     * [x] @minecraft/server-gametest           (internal)
      * [ ] @minecraft/common                    (internal)
      * [ ] @minecraft/debug-utilities           (internal)
      * [ ] @minecraft/server-admin              (internal) (bds_only)
      * [ ] @minecraft/server-net                (internal) (bds_only)
      * [ ] @minecraft/server-editor             (internal) (prerelease)
-     * [x] @minecraft/vanilla-data              (external) (important)
-     * [ ] @minecraft/math                      (external) (unimportant)
+     * [x] @minecraft/vanilla-data              (external)
      */
-    let progressSteps = 0
-    const totalSteps = 3
 
-    let v_mc, v_ui, v_data
+    let v_mc, v_ui, v_test, v_data
     await ProgressBar.listen(async (setProgress, setHintText, close, sleep) => {
         setHintText("Getting versions of dependencies...")
         await sleep(500)
         setHintText("")
-        ;[v_mc, v_ui, v_data] = await Promise.all(
-            ["@minecraft/server", "@minecraft/server-ui", "@minecraft/vanilla-data"].map((name) =>
+        ;[v_mc, v_ui, v_test, v_data] = await Promise.all(
+            ["@minecraft/server", "@minecraft/server-ui", "@minecraft/server-gametest", "@minecraft/vanilla-data"].map((name) =>
                 getDepVersions(name).then((v) => {
                     setProgress(++progressSteps, totalSteps)
                     return v
@@ -92,20 +93,23 @@ try {
         close("\x1b[32m✔\x1b[0m Successfully getting versions of dependencies!")
     })
 
-    let selected_v_mc, selected_v_ui, selected_v_data
+    let selected_v_mc, selected_v_ui, selected_v_test, selected_v_data
 
     if (await confirm({ message: "Use Latest Dependencies?", default: false })) {
         selected_v_mc = v_mc.find((v) => !v.includes("-"))
         selected_v_ui = v_ui.find((v) => !v.includes("-"))
+        selected_v_test = v_test.find((v) => !v.includes("-"))
         selected_v_data = v_data.find((v) => !v.includes("-"))
 
         process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/server version: \x1b[36m${selected_v_mc}\x1b[0m\n`)
         process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/server-ui version: \x1b[36m${selected_v_ui}\x1b[0m\n`)
+        process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/server-gametest version: \x1b[36m${selected_v_test}\x1b[0m\n`)
         process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/vanilla-data version: \x1b[36m${selected_v_data}\x1b[0m\n`)
         process.stdout.write(`\x1b[35m  (automatically)\x1b[0m\n`)
     } else {
         selected_v_mc = await chooseVersion(v_mc, "@minecraft/server version:")
         selected_v_ui = await chooseVersion(v_ui, "@minecraft/server-ui version:")
+        selected_v_test = await chooseVersion(v_test, "@minecraft/server-gametest version:")
         selected_v_data = await chooseVersion(v_data, "@minecraft/vanilla-data version:")
         process.stdout.write(`\x1b[35m  (manually)\x1b[0m\n`)
     }
@@ -131,13 +135,14 @@ try {
         min_engine_version: minEngineVersion.split(".").map((ver) => Number(ver.trim())),
         minecraft_server_version: selected_v_mc.split("-")[0],
         minecraft_server_ui_version: selected_v_ui.split("-")[0],
+        minecraft_server_gametest_version: selected_v_test.split("-")[0],
     })
 
     if (!(await confirm({ message: "Is that ok?", default: true }))) {
         process.exit(1)
     }
 
-    await generateFiles(name, manifestRes, manifestBeh, selected_v_mc, selected_v_ui, selected_v_data)
+    await generateFiles(name, manifestRes, manifestBeh, selected_v_mc, selected_v_ui, selected_v_test, selected_v_data)
 
     process.stdout.write(`\x1b[1mNow run:\x1b[0m
     cd ${name}

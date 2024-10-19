@@ -12,8 +12,6 @@ import { tmpdir } from "node:os"
  * @private
  * @typedef {Object} Options
  * @property {boolean=} isBeta - Determines if beta versions should be included.
- * @property {number=} page - The page number of results.
- * @property {number=} pageSize - The number of results per page.
  */
 
 /**

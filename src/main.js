@@ -1,151 +1,133 @@
-import getDepVersions from "./func/GetDepVersions.js"
-import generateFiles from "./func/GenerateFiles.js"
-import printHelp from "./cmd/Help.js"
-import printVersion from "./cmd/Version.js"
-import createManifest from "./func/CreateManifest.js"
-import { confirm, input, select } from "@inquirer/prompts"
-import { randomUUID } from "crypto"
-import ProgressBar from "./classes/ProgressBar.js"
-import { type } from "os"
+/**
+ * @fileoverview 主程序入口
+ */
 
-const parseCommandLineArgs = () => {
-    const processArgs = new Map()
-    const { argv } = process
+import { 
+    parseCommandLineArgs, 
+    handleHelpAndVersion,
+    getProjectInfo,
+    getUUIDs,
+    getDependencyVersions,
+    confirmConfiguration
+} from './cli/commands/commandHandler.js'
+import { ProgressBar } from './cli/progress/ProgressBar.js'
+import { generateManifests, validateManifestInfo } from './core/manifest/manifestGenerator.js'
+import { generateProject } from './core/generator/projectGenerator.js'
+import { CLI_MESSAGES } from './constants/messages.js'
+import { DEFAULT_CONFIG, PROGRESS_BAR } from './constants/configs.js'
+import { formatSuccess } from './utils/format.js'
+import getVersions from './core/version/versionFetcher.js'
 
-    for (let i = 0; i < argv.length; i++) {
-        if (argv[i].startsWith("-")) {
-            const next = argv[i + 1] ?? ""
-            if (next.startsWith("-")) {
-                processArgs.set(argv[i], "")
-            } else {
-                processArgs.set(argv[i], next.toLowerCase() ?? "")
-                i++
-            }
-        }
+/**
+ * 获取依赖版本信息
+ * @returns {Promise<Object>} 依赖版本信息
+ */
+async function fetchDependencyVersions() {
+    let versions = {
+        server: [],
+        ui: [],
+        test: [],
+        data: []
     }
-
-    return processArgs
-}
-
-const chooseVersion = async (versionList, message) => {
-    const choices = versionList.map((version) => ({
-        name: version,
-        value: version,
-        description: "",
-    }))
-    const answer = await select({ message, choices, pageSize: 7, loop: false })
-    return answer
-}
-
-try {
-    const processArgs = parseCommandLineArgs()
-
-    if (processArgs.has("--help") || processArgs.has("-h")) {
-        await printHelp()
-        process.exit(0)
-    }
-
-    if (processArgs.has("--version") || processArgs.has("-v")) {
-        await printVersion()
-        process.exit(0)
-    }
-
-    const name = processArgs.get("--name") ?? (await input({ message: "Name:", required: true }))
-    const desc = processArgs.get("--desc") ?? (await input({ message: "Desc:", required: true }))
-    const auth = processArgs.get("--author") ?? (await input({ message: "Author:" })) ?? "unknown"
-
-    const validateUUID = (uuidInput) => /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(uuidInput.trim().toLowerCase())
-
-    const uuid1 = processArgs.get("--uuid1") ?? (await input({ message: "UUID(r):", default: randomUUID(), validate: validateUUID }))
-    const uuid2 = processArgs.get("--uuid2") ?? (await input({ message: "UUID(m):", default: randomUUID(), validate: validateUUID }))
-    const uuid3 = processArgs.get("--uuid3") ?? (await input({ message: "UUID(b):", default: randomUUID(), validate: validateUUID }))
-    const uuid4 = processArgs.get("--uuid4") ?? (await input({ message: "UUID(s):", default: randomUUID(), validate: validateUUID }))
 
     let progressSteps = 0
-    const totalSteps = 3
+    await ProgressBar.listen(async (setProgress, setHintText, complete, sleep) => {
+        setHintText(CLI_MESSAGES.PROGRESS_GET_DEPS)
+        
+        // 获取各个依赖包的版本信息
+        const [serverVersions, uiVersions, testVersions, dataVersions] = await Promise.all([
+            getVersions('@minecraft/server'),
+            getVersions('@minecraft/server-ui'),
+            getVersions('@minecraft/server-gametest'),
+            getVersions('@minecraft/vanilla-data')
+        ])
 
-    /*
-     * [x] @minecraft/server                    (internal)
-     * [x] @minecraft/server-ui                 (internal)
-     * [x] @minecraft/server-gametest           (internal)
-     * [ ] @minecraft/common                    (internal)
-     * [ ] @minecraft/debug-utilities           (internal)
-     * [ ] @minecraft/server-admin              (internal) (bds_only)
-     * [ ] @minecraft/server-net                (internal) (bds_only)
-     * [ ] @minecraft/server-editor             (internal) (prerelease)
-     * [x] @minecraft/vanilla-data              (external)
-     */
+        versions = {
+            server: serverVersions,
+            ui: uiVersions,
+            test: testVersions,
+            data: dataVersions
+        }
 
-    let v_mc, v_ui, v_test, v_data
-    await ProgressBar.listen(async (setProgress, setHintText, close, sleep) => {
-        setHintText("Getting versions of dependencies...")
-        await sleep(500)
-        setHintText("")
-        ;[v_mc, v_ui, v_test, v_data] = await Promise.all(
-            ["@minecraft/server", "@minecraft/server-ui", "@minecraft/server-gametest", "@minecraft/vanilla-data"].map((name) =>
-                getDepVersions(name).then((v) => {
-                    setProgress(++progressSteps, totalSteps)
-                    return v
-                }),
-            ),
-        )
-        await sleep(500)
-        close("\x1b[32m✔\x1b[0m Successfully getting versions of dependencies!")
+        setProgress(++progressSteps, PROGRESS_BAR.TOTAL_STEPS)
+        sleep(500)
+        complete(CLI_MESSAGES.PROGRESS_SUCCESS)
     })
 
-    let selected_v_mc, selected_v_ui, selected_v_test, selected_v_data
+    return versions
+}
 
-    if (await confirm({ message: "Use Latest Dependencies?", default: false })) {
-        selected_v_mc = v_mc.find((v) => !v.includes("-"))
-        selected_v_ui = v_ui.find((v) => !v.includes("-"))
-        selected_v_test = v_test.find((v) => !v.includes("-"))
-        selected_v_data = v_data.find((v) => !v.includes("-"))
+/**
+ * 主程序入口
+ */
+async function main() {
+    try {
+        // 解析命令行参数
+        const args = parseCommandLineArgs()
 
-        process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/server version: \x1b[36m${selected_v_mc}\x1b[0m\n`)
-        process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/server-ui version: \x1b[36m${selected_v_ui}\x1b[0m\n`)
-        process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/server-gametest version: \x1b[36m${selected_v_test}\x1b[0m\n`)
-        process.stdout.write(`\x1b[32m✔\x1b[0m @minecraft/vanilla-data version: \x1b[36m${selected_v_data}\x1b[0m\n`)
-        process.stdout.write(`\x1b[35m  (automatically)\x1b[0m\n`)
-    } else {
-        selected_v_mc = await chooseVersion(v_mc, "@minecraft/server version:")
-        selected_v_ui = await chooseVersion(v_ui, "@minecraft/server-ui version:")
-        selected_v_test = await chooseVersion(v_test, "@minecraft/server-gametest version:")
-        selected_v_data = await chooseVersion(v_data, "@minecraft/vanilla-data version:")
-        process.stdout.write(`\x1b[35m  (manually)\x1b[0m\n`)
-    }
+        // 处理帮助和版本命令
+        if (handleHelpAndVersion(args)) {
+            return
+        }
 
-    const minEngineVersion = await input({
-        message: "Min-Engine-Version:",
-        default: selected_v_data
-            .split("-")[0]
-            .split(".")
-            .map((val, idx) => (idx === 2 ? 0 : val))
-            .join("."),
-        validate: (input) => /^\s*\d+\s*\.\s*\d+\s*\.\s*\d+\s*$/.test(input),
-    })
+        // 获取项目基本信息
+        const projectInfo = await getProjectInfo(args)
 
-    const [manifestRes, manifestBeh] = await createManifest({
-        name,
-        desc,
-        auth,
-        uuid1,
-        uuid2,
-        uuid3,
-        uuid4,
-        min_engine_version: minEngineVersion.split(".").map((ver) => Number(ver.trim())),
-        minecraft_server_version: selected_v_mc.split("-")[0],
-        minecraft_server_ui_version: selected_v_ui.split("-")[0],
-        minecraft_server_gametest_version: selected_v_test.split("-")[0],
-    })
+        // 获取UUID信息
+        const uuidInfo = await getUUIDs(args)
 
-    if (!(await confirm({ message: "Is that ok?", default: true }))) {
+        // 获取依赖版本信息
+        const versions = await fetchDependencyVersions()
+        const dependencyVersions = await getDependencyVersions(versions)
+
+        // 计算最小引擎版本
+        const minEngineVersion = dependencyVersions.dataVersion
+            .split('-')[0]
+            .split('.')
+            .map((val, idx) => (idx === 2 ? 0 : Number(val)))
+
+        // 创建清单信息
+        const manifestInfo = {
+            ...projectInfo,
+            ...uuidInfo,
+            min_engine_version: minEngineVersion,
+            minecraft_server_version: dependencyVersions.serverVersion,
+            minecraft_server_ui_version: dependencyVersions.uiVersion,
+            minecraft_server_gametest_version: dependencyVersions.testVersion
+        }
+
+        // 验证清单信息
+        validateManifestInfo(manifestInfo)
+
+        // 生成清单文件
+        const [resourceManifest, behaviorManifest] = generateManifests(manifestInfo)
+
+        // 确认配置
+        if (!await confirmConfiguration()) {
+            process.exit(1)
+        }
+
+        // 生成项目文件
+        await generateProject({
+            name: projectInfo.name,
+            description: projectInfo.desc,
+            resourceManifest,
+            behaviorManifest,
+            serverVersion: dependencyVersions.serverVersion,
+            uiVersion: dependencyVersions.uiVersion,
+            gametestVersion: dependencyVersions.testVersion,
+            dataVersion: dependencyVersions.dataVersion
+        })
+
+        // 显示完成信息
+        console.log(formatSuccess(CLI_MESSAGES.COMPLETE_MESSAGE))
+        console.log(CLI_MESSAGES.COMPLETE_COMMANDS.replace('{name}', projectInfo.name))
+
+    } catch (error) {
+        console.error(error)
         process.exit(1)
     }
+}
 
-    await generateFiles(name, manifestRes, manifestBeh, selected_v_mc, selected_v_ui, selected_v_test, selected_v_data)
-
-    process.stdout.write(`\x1b[1mNow run:\x1b[0m
-    cd ${name}
-    npm i
-    powershell Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass\n`)
-} catch {}
+// 执行主程序
+main()

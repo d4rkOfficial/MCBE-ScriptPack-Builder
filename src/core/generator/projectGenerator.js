@@ -133,7 +133,7 @@ async function generatePackageJson(projectPath, config) {
             description: config.description,
             serverVersion: config.serverVersion,
             uiVersion: config.uiVersion,
-            gametestVersion: config.gametestVersion,
+            // gametestVersion: config.gametestVersion,
             dataVersion: config.dataVersion
         }
     )

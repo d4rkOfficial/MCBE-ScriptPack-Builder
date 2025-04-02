@@ -139,7 +139,7 @@ export function validateManifestInfo(info) {
     const versions = [
         info.minecraft_server_version,
         info.minecraft_server_ui_version,
-        info.minecraft_server_gametest_version
+        // info.minecraft_server_gametest_version
     ]
     if (!versions.every(v => typeof v === 'string' && /^\d+\.\d+\.\d+/.test(v))) {
         throw new Error('Invalid dependency version format')

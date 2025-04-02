@@ -236,8 +236,9 @@ export const FILE_TEMPLATES = {
         "dependencies": {
             "@minecraft/server": "^{serverVersion}",
             "@minecraft/server-ui": "^{uiVersion}",
-            "@minecraft/server-gametest": "{gametestVersion}",
             "@minecraft/vanilla-data": "^{dataVersion}"
         }
     }`)
 }
+
+// @note removed: "@minecraft/server-gametest": "{gametestVersion}",

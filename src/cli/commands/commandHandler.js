@@ -152,7 +152,7 @@ export async function getDependencyVersions(versions) {
     return {
         serverVersion: await chooseVersion(versions.server, CLI_MESSAGES.VERSION_SELECT_SERVER),
         uiVersion: await chooseVersion(versions.ui, CLI_MESSAGES.VERSION_SELECT_UI),
-        testVersion: await chooseVersion(versions.test, CLI_MESSAGES.VERSION_SELECT_GAMETEST),
+        // testVersion: await chooseVersion(versions.test, CLI_MESSAGES.VERSION_SELECT_GAMETEST),
         dataVersion: await chooseVersion(versions.data, CLI_MESSAGES.VERSION_SELECT_DATA),
         isAutomatic: false
     }

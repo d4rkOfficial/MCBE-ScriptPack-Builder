@@ -1,6 +1,6 @@
 /**
  * @fileoverview 主程序入口
- */
+ */ 
 
 import { 
     parseCommandLineArgs, 
@@ -38,14 +38,14 @@ async function fetchDependencyVersions() {
         const [serverVersions, uiVersions, testVersions, dataVersions] = await Promise.all([
             getVersions('@minecraft/server'),
             getVersions('@minecraft/server-ui'),
-            getVersions('@minecraft/server-gametest'),
+            [], // getVersions('@minecraft/server-gametest'),
             getVersions('@minecraft/vanilla-data')
         ])
 
         versions = {
             server: serverVersions,
             ui: uiVersions,
-            test: testVersions,
+            // test: testVersions,
             data: dataVersions
         }
 
@@ -93,7 +93,7 @@ async function main() {
             min_engine_version: minEngineVersion,
             minecraft_server_version: dependencyVersions.serverVersion,
             minecraft_server_ui_version: dependencyVersions.uiVersion,
-            minecraft_server_gametest_version: dependencyVersions.testVersion
+            // minecraft_server_gametest_version: dependencyVersions.testVersion
         }
 
         // 验证清单信息
@@ -115,7 +115,7 @@ async function main() {
             behaviorManifest,
             serverVersion: dependencyVersions.serverVersion,
             uiVersion: dependencyVersions.uiVersion,
-            gametestVersion: dependencyVersions.testVersion,
+            // gametestVersion: dependencyVersions.testVersion,
             dataVersion: dependencyVersions.dataVersion
         })
 

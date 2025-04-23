@@ -5,6 +5,7 @@
 import { platform } from 'node:os'
 import { execSync } from 'node:child_process'
 
+const VERSION = "2.0.2"
 // 支持的语言代码
 export const SUPPORTED_LANGUAGES = {
     EN: 'en',
@@ -32,7 +33,7 @@ const EN_MESSAGES = {
     --lang    Specify interface language (available: cn, en, jp, kr)
               If not provided, will use system language.`,
     HELP_EXIT: "> press enter to exit. <",
-    VERSION_INFO: "MCBE Script Pack Builder v1.1.0",
+    VERSION_INFO: `MCBE Script Pack Builder v${VERSION}`,
     
     PROMPT_NAME: "Name:",
     PROMPT_DESC: "Description:",
@@ -77,7 +78,7 @@ const ZH_MESSAGES = {
     --lang    指定界面语言 (可选值: cn, en, jp, kr)
               如果未提供，将根据系统语言自动选择。`,
     HELP_EXIT: "> 按回车键退出 <",
-    VERSION_INFO: "MCBE 脚本包生成器 v1.1.0",
+    VERSION_INFO: `MCBE 脚本包生成器 v1.1.0${VERSION}`,
     
     PROMPT_NAME: "名称：",
     PROMPT_DESC: "描述：",
@@ -122,7 +123,7 @@ const JA_MESSAGES = {
     --lang    インターフェース言語を指定 (選択可能: cn, en, jp, kr)
               指定がない場合、システム言語を使用します。`,
     HELP_EXIT: "> Enterキーを押して終了 <",
-    VERSION_INFO: "MCBE スクリプトパックビルダー v1.1.0",
+    VERSION_INFO: `MCBE スクリプトパックビルダー v${VERSION}`,
     
     PROMPT_NAME: "名前：",
     PROMPT_DESC: "説明：",
@@ -167,7 +168,7 @@ const KO_MESSAGES = {
     --lang    인터페이스 언어 지정 (선택 가능: cn, en, jp, kr)
               지정하지 않으면 시스템 언어를 사용합니다.`,
     HELP_EXIT: "> 종료하려면 엔터 키를 누르세요 <",
-    VERSION_INFO: "MCBE 스크립트 팩 빌더 v1.1.0",
+    VERSION_INFO: `MCBE 스크립트 팩 빌더 v1.1.0${VERSION}`,
     
     PROMPT_NAME: "이름：",
     PROMPT_DESC: "설명：",

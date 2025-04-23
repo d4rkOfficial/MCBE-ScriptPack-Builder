@@ -16,7 +16,7 @@ import { DEFAULT_CONFIG, MANIFEST_TYPES, SCRIPT_CONFIG } from '../../constants/c
  * @property {[number, number, number]} min_engine_version - 最小引擎版本
  * @property {string} minecraft_server_version - minecraft/server 版本
  * @property {string} minecraft_server_ui_version - minecraft/server-ui 版本
- * @property {string} minecraft_server_gametest_version - minecraft/server-gametest 版本
+ * @deprecated @property {string} minecraft_server_gametest_version - minecraft/server-gametest 版本
  */
 
 /**
@@ -85,10 +85,10 @@ function createBehaviorManifest(info) {
                 module_name: DEFAULT_CONFIG.DEPENDENCIES.SERVER_UI,
                 version: info.minecraft_server_ui_version
             },
-            {
-                module_name: DEFAULT_CONFIG.DEPENDENCIES.SERVER_GAMETEST,
-                version: info.minecraft_server_gametest_version
-            },
+            // {
+            //     module_name: DEFAULT_CONFIG.DEPENDENCIES.SERVER_GAMETEST,
+            //     version: info.minecraft_server_gametest_version
+            // },
             {
                 uuid: info.uuid1,
                 version: DEFAULT_CONFIG.DEFAULT_VERSION

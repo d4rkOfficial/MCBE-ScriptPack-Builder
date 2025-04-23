@@ -78,7 +78,7 @@ const ZH_MESSAGES = {
     --lang    指定界面语言 (可选值: cn, en, jp, kr)
               如果未提供，将根据系统语言自动选择。`,
     HELP_EXIT: "> 按回车键退出 <",
-    VERSION_INFO: `MCBE 脚本包生成器 v1.1.0${VERSION}`,
+    VERSION_INFO: `MCBE 脚本包生成器 v${VERSION}`,
     
     PROMPT_NAME: "名称：",
     PROMPT_DESC: "描述：",
@@ -168,7 +168,7 @@ const KO_MESSAGES = {
     --lang    인터페이스 언어 지정 (선택 가능: cn, en, jp, kr)
               지정하지 않으면 시스템 언어를 사용합니다.`,
     HELP_EXIT: "> 종료하려면 엔터 키를 누르세요 <",
-    VERSION_INFO: `MCBE 스크립트 팩 빌더 v1.1.0${VERSION}`,
+    VERSION_INFO: `MCBE 스크립트 팩 빌더 v${VERSION}`,
     
     PROMPT_NAME: "이름：",
     PROMPT_DESC: "설명：",

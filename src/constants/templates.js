@@ -5,8 +5,8 @@
 import { dedent } from '../utils/format.js'
 
 export const FILE_TEMPLATES = {
-    // TypeScript 主文件模板
-    MAIN_SCRIPT: dedent(`
+  // TypeScript 主文件模板
+  MAIN_SCRIPT: dedent(`
         import * as mc from "@minecraft/server"
 
         function mainTick() {
@@ -19,14 +19,14 @@ export const FILE_TEMPLATES = {
 
         mc.system.run(mainTick)`),
 
-    // 环境配置文件模板
-    ENV: dedent(`
+  // 环境配置文件模板
+  ENV: dedent(`
         PROJECT_NAME="{projectName}"
         MINECRAFT_PRODUCT="BedrockUWP"
         CUSTOM_DEPLOYMENT_PATH=""`),
 
-    // Prettier 配置模板
-    PRETTIER_CONFIG: dedent(`{
+  // Prettier 配置模板
+  PRETTIER_CONFIG: dedent(`{
         "trailingComma": "all",
         "tabWidth": 4,
         "semi": false,
@@ -37,8 +37,8 @@ export const FILE_TEMPLATES = {
         "endOfLine": "auto"
     }`),
 
-    // ESLint 配置模板
-    ESLINT_CONFIG: dedent(`
+  // ESLint 配置模板
+  ESLINT_CONFIG: dedent(`
         import minecraftLinting from "eslint-plugin-minecraft-linting"
         import tsParser from "@typescript-eslint/parser"
         import ts from "@typescript-eslint/eslint-plugin"
@@ -60,8 +60,8 @@ export const FILE_TEMPLATES = {
             },
         ]`),
 
-    // Just 配置模板
-    JUST_CONFIG: dedent(`
+  // Just 配置模板
+  JUST_CONFIG: dedent(`
         import { argv, parallel, series, task, tscTask } from "just-scripts"
         import {
             BundleTaskParameters,
@@ -135,9 +135,9 @@ export const FILE_TEMPLATES = {
         task("createMcaddonFile", mcaddonTask(mcaddonTaskOptions))
         task("mcaddon", series("clean-local", "build", "createMcaddonFile"))`),
 
-    // VSCode 配置模板
-    VSCODE: {
-        EXTENSIONS: dedent(`{
+  // VSCode 配置模板
+  VSCODE: {
+    EXTENSIONS: dedent(`{
             "recommendations": [
                 "esbenp.prettier-vscode",
                 "blockceptionltd.blockceptionvscodeminecraftbedrockdevelopmentextension",
@@ -145,7 +145,7 @@ export const FILE_TEMPLATES = {
             ]
         }`),
 
-        LAUNCH: dedent(`{
+    LAUNCH: dedent(`{
             "version": "0.2.0",
             "configurations": [
                 {
@@ -161,7 +161,7 @@ export const FILE_TEMPLATES = {
             ]
         }`),
 
-        SETTINGS: dedent(`{
+    SETTINGS: dedent(`{
             "[javascript]": {
                 "editor.defaultFormatter": "esbenp.prettier-vscode"
             },
@@ -192,7 +192,7 @@ export const FILE_TEMPLATES = {
             "eslint.experimental.useFlatConfig": true
         }`),
 
-        TASKS: dedent(`{
+    TASKS: dedent(`{
             "version": "2.0.0",
             "tasks": [
                 {
@@ -207,10 +207,10 @@ export const FILE_TEMPLATES = {
                 }
             ]
         }`)
-    },
+  },
 
-    // Package.json 模板
-    PACKAGE_JSON: dedent(`{
+  // Package.json 模板
+  PACKAGE_JSON: dedent(`{
         "name": "{name}",
         "version": "0.1.0",
         "productName": "{name}",
@@ -240,5 +240,3 @@ export const FILE_TEMPLATES = {
         }
     }`)
 }
-
-// @note removed: "@minecraft/server-gametest": "{gametestVersion}",

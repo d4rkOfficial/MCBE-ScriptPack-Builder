@@ -5,7 +5,7 @@
 import { platform } from 'node:os'
 import { execSync } from 'node:child_process'
 
-const VERSION = '2.0.4'
+const VERSION = '2.0.5'
 // 支持的语言代码
 export const SUPPORTED_LANGUAGES = {
   EN: 'en',

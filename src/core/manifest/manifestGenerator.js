@@ -85,7 +85,7 @@ function createBehaviorManifest (info) {
               return version
             }
             return `${version.split('-')[0]}-beta`
-          })
+          })[0]
       },
       {
         module_name: DEFAULT_CONFIG.DEPENDENCIES.SERVER_UI,
@@ -95,7 +95,7 @@ function createBehaviorManifest (info) {
               return version
             }
             return `${version.split('-')[0]}-beta`
-          })
+          })[0]
       },
       {
         uuid: info.uuid1,

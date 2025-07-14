@@ -67,6 +67,8 @@ async function main () {
       return
     }
 
+    // @todo 延迟
+
     // 获取项目基本信息
     const projectInfo = await getProjectInfo(args)
 
